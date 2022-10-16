@@ -319,7 +319,7 @@ maturl = 'https://github.com/fenglinglwb/MAT'
 gr.Interface(
     _outpaint,
     [searchimage, to_size, border, seed, size, model],
-    [out, outwithoutalpha, mask],
+    [outwithoutalpha,out,  mask],
     title=f"MAT Primer for Stable Diffusion\n\nbased on MAT: Mask-Aware Transformer for Large Hole Image Inpainting\n\n{maturl}",
     description=f"""<html>
     create an primer for use in stable diffusion outpainting<br>
