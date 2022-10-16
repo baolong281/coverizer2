@@ -231,6 +231,12 @@ class Predictor:
                 truncation_psi=1.,
                 noise_mode='const',
             ),
+            "places2+laion300k+laion300k(opmasked)": Inpainter(
+                network_pkl='models/Places_512_FullData+LAION300k+OPM300k.pkl',
+                resolution=512,
+                truncation_psi=1.,
+                noise_mode='const',
+            ),
         }
 
     # The arguments and types the model takes as input
@@ -303,8 +309,8 @@ outwithoutalpha = gc.Image(
 mask = gc.Image(label="outpainting mask", type='pil')
 
 model = gc.Dropdown(
-    choices=['places2', 'places2+laion300k'],
-    value='places2',
+    choices=['places2', 'places2+laion300k', 'places2+laion300k+laion300k(opmasked)'],
+    value='places2+laion300k+laion300k(opmasked)',
     label='model',
 )
 
