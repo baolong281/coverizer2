@@ -201,7 +201,7 @@ def pad(img, size=(128, 128), tosize=(512, 512), border=1):
     mask.paste(white, tc)
 
     if 'A' in rimg.getbands():
-        mask.paste(img.getchannel('A'), tc)
+        mask.paste(rimg.getchannel('A'), tc)
     return new_img, mask
 
 
