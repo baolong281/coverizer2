@@ -302,45 +302,54 @@ def _outpaint(img, tosize, border, seed, size, model):
 # %%
 
 
-searchimage = gc.Image(shape=(224, 224), label="image",
-                       type='pil', image_mode='RGBA')
-to_size = gc.Slider(1, 1920, 512, step=1, label='output size')
-border = gc.Slider(
-    1, 50, 0, step=1, label='border to crop from the image before outpainting')
-seed = gc.Slider(1, 65536, 10, step=1, label='seed')
-size = gc.Slider(0, 1, .5, step=0.01,
-                 label='scale of the image before outpainting')
+with gr.Blocks() as demo:
+    maturl = 'https://github.com/fenglinglwb/MAT'
+    gr.Markdown(f'''
+        # MAT Primer for Stable Diffusion
+        ## based on MAT: Mask-Aware Transformer for Large Hole Image Inpainting
+        ### create a primer for use in stable diffusion outpainting
+        ''')
 
-out = gc.Image(label="primed image with alpha channel",
-               type='pil', image_mode='RGBA')
-outwithoutalpha = gc.Image(
-    label="primed image without alpha channel", type='pil')
-mask = gc.Image(label="outpainting mask", type='pil')
+    gr.HTML(f'''<a href="{maturl}">{maturl}</a>''')
+    with gr.Box():
+        with gr.Row():
+            gr.Markdown(f"""example with strength 0.5""")
+        with gr.Row():
+            gr.HTML("<img src='file/op.gif'> ")
+            gr.HTML("<img src='file/rgba.gif'>")
+    btn = gr.Button("Run", variant="primary")
+    with gr.Row():
+        with gr.Column():
+            searchimage = gc.Image(
+                shape=(224, 224), label="image", type='pil', image_mode='RGBA')
+            to_size = gc.Slider(1, 1920, 512, step=1, label='output size')
+            border = gc.Slider(
+                1, 50, 0, step=1, label='border to crop from the image before outpainting')
+            seed = gc.Slider(1, 65536, 10, step=1, label='seed')
+            size = gc.Slider(0, 1, .5, step=0.01,
+                             label='scale of the image before outpainting')
 
-model = gc.Dropdown(
-    choices=['places2',
-             'places2+laion300k',
-             'places2+laion300k+laion300k(opmasked)',
-             'places2+laion300k+laion1200k(opmasked)'
-             ],
-    value='places2+laion300k+laion1200k(opmasked)',
-    label='model',
-)
+            model = gc.Dropdown(
+                choices=['places2',
+                         'places2+laion300k',
+                         'places2+laion300k+laion300k(opmasked)',
+                         'places2+laion300k+laion1200k(opmasked)'
+                         ],
+                value='places2+laion300k+laion1200k(opmasked)',
+                label='model',
+            )
+        with gr.Column():
+            outwithoutalpha = gc.Image(
+                label="primed image without alpha channel", type='pil', image_mode='RGBA')
+            mask = gc.Image(label="outpainting mask", type='pil')
+            out = gc.Image(label="primed image with alpha channel",
+                           type='pil', image_mode='RGBA')
+
+    btn.click(
+        fn=_outpaint,
+        inputs=[searchimage, to_size, border, seed, size, model],
+        outputs=[outwithoutalpha, out,  mask])
 
 
-maturl = 'https://github.com/fenglinglwb/MAT'
-gr.Interface(
-    _outpaint,
-    [searchimage, to_size, border, seed, size, model],
-    [outwithoutalpha, out,  mask],
-    title=f"MAT Primer for Stable Diffusion\n\nbased on MAT: Mask-Aware Transformer for Large Hole Image Inpainting\n\n{maturl}",
-    description=f"""<html>
-    create a primer for use in stable diffusion outpainting<br>
-    examples with strength 0.5
-    <img src='file/op.gif' /> <img src='file/rgba.gif' />
-    </html>""",
-    analytics_enabled=False,
-    allow_flagging='never',
-
-
-).launch()
+# %% launch
+demo.launch()
