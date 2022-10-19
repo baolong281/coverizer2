@@ -316,7 +316,7 @@ with gr.Blocks() as demo:
             gr.Markdown(f"""example with strength 0.5""")
         with gr.Row():
             gr.HTML("<img src='file/op.gif'> ")
-            gr.HTML("<img src='file/rgba.gif'>")
+            gr.HTML("<img src='file/process.gif'>")
     btn = gr.Button("Run", variant="primary")
     with gr.Row():
         with gr.Column():
