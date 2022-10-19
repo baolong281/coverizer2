@@ -281,7 +281,7 @@ class Predictor:
             1-(np.array(m) / 255)
         )
         minpainted = mask_to_alpha(inpainted, m)
-        return minpainted, inpainted, ImageOps.invert(m)
+        return inpainted, minpainted,  ImageOps.invert(m)
 
 
 predictor = Predictor()
@@ -302,7 +302,8 @@ def _outpaint(img, tosize, border, seed, size, model):
 # %%
 
 
-searchimage = gc.Image(shape=(224, 224), label="image", type='pil', image_mode='RGBA')
+searchimage = gc.Image(shape=(224, 224), label="image",
+                       type='pil', image_mode='RGBA')
 to_size = gc.Slider(1, 1920, 512, step=1, label='output size')
 border = gc.Slider(
     1, 50, 0, step=1, label='border to crop from the image before outpainting')
@@ -310,7 +311,8 @@ seed = gc.Slider(1, 65536, 10, step=1, label='seed')
 size = gc.Slider(0, 1, .5, step=0.01,
                  label='scale of the image before outpainting')
 
-out = gc.Image(label="primed image with alpha channel", type='pil', image_mode='RGBA')
+out = gc.Image(label="primed image with alpha channel",
+               type='pil', image_mode='RGBA')
 outwithoutalpha = gc.Image(
     label="primed image without alpha channel", type='pil')
 mask = gc.Image(label="outpainting mask", type='pil')
@@ -333,9 +335,9 @@ gr.Interface(
     [outwithoutalpha, out,  mask],
     title=f"MAT Primer for Stable Diffusion\n\nbased on MAT: Mask-Aware Transformer for Large Hole Image Inpainting\n\n{maturl}",
     description=f"""<html>
-    create an primer for use in stable diffusion outpainting<br>
-    example with strength 0.5
-    <img src='file/op.gif' />
+    create a primer for use in stable diffusion outpainting<br>
+    examples with strength 0.5
+    <img src='file/op.gif' /> <img src='file/rgba.gif' />
     </html>""",
     analytics_enabled=False,
     allow_flagging='never',
