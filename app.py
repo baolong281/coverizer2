@@ -320,30 +320,24 @@ with gr.Blocks() as demo:
     btn = gr.Button("Run", variant="primary")
     with gr.Row():
         with gr.Column():
-            searchimage = gc.Image(
-                shape=(224, 224), label="image", type='pil', image_mode='RGBA')
+            searchimage = gc.Image(label="image", type='pil', image_mode='RGBA')
             to_size = gc.Slider(1, 1920, 512, step=1, label='output size')
-            border = gc.Slider(
-                1, 50, 0, step=1, label='border to crop from the image before outpainting')
+            border = gc.Slider(1, 50, 0, step=1, label='border to crop from the image before outpainting')
             seed = gc.Slider(1, 65536, 10, step=1, label='seed')
-            size = gc.Slider(0, 1, .5, step=0.01,
-                             label='scale of the image before outpainting')
+            size = gc.Slider(0, 1, .5, step=0.01,label='scale of the image before outpainting')
 
             model = gc.Dropdown(
                 choices=['places2',
                          'places2+laion300k',
                          'places2+laion300k+laion300k(opmasked)',
-                         'places2+laion300k+laion1200k(opmasked)'
-                         ],
+                         'places2+laion300k+laion1200k(opmasked)'],
                 value='places2+laion300k+laion1200k(opmasked)',
                 label='model',
             )
         with gr.Column():
-            outwithoutalpha = gc.Image(
-                label="primed image without alpha channel", type='pil', image_mode='RGBA')
+            outwithoutalpha = gc.Image(label="primed image without alpha channel", type='pil', image_mode='RGBA')
             mask = gc.Image(label="outpainting mask", type='pil')
-            out = gc.Image(label="primed image with alpha channel",
-                           type='pil', image_mode='RGBA')
+            out = gc.Image(label="primed image with alpha channel",type='pil', image_mode='RGBA')
 
     btn.click(
         fn=_outpaint,
