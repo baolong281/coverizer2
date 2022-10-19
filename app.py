@@ -237,6 +237,13 @@ class Predictor:
                 truncation_psi=1.,
                 noise_mode='const',
             ),
+            "places2+laion300k+laion1200k(opmasked)": Inpainter(
+                network_pkl='models/Places_512_FullData+LAION300k+OPM1200k.pkl',
+                resolution=512,
+                truncation_psi=1.,
+                noise_mode='const',
+            ),
+
         }
 
     # The arguments and types the model takes as input
@@ -309,8 +316,12 @@ outwithoutalpha = gc.Image(
 mask = gc.Image(label="outpainting mask", type='pil')
 
 model = gc.Dropdown(
-    choices=['places2', 'places2+laion300k', 'places2+laion300k+laion300k(opmasked)'],
-    value='places2+laion300k+laion300k(opmasked)',
+    choices=['places2',
+             'places2+laion300k',
+             'places2+laion300k+laion300k(opmasked)',
+             'places2+laion300k+laion1200k(opmasked)'
+             ],
+    value='places2+laion300k+laion1200k(opmasked)',
     label='model',
 )
 
@@ -319,7 +330,7 @@ maturl = 'https://github.com/fenglinglwb/MAT'
 gr.Interface(
     _outpaint,
     [searchimage, to_size, border, seed, size, model],
-    [outwithoutalpha,out,  mask],
+    [outwithoutalpha, out,  mask],
     title=f"MAT Primer for Stable Diffusion\n\nbased on MAT: Mask-Aware Transformer for Large Hole Image Inpainting\n\n{maturl}",
     description=f"""<html>
     create an primer for use in stable diffusion outpainting<br>
