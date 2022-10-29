@@ -317,7 +317,7 @@ with gr.Blocks() as demo:
         with gr.Row():
             gr.HTML("<img src='file/hild.gif'> ")
             gr.HTML("<img src='file/process.gif'>")
-            gr.HTML("<img src='file/heineken.gif'>")
+            gr.HTML("<img src='file/walmart.gif'>")
     btn = gr.Button("Run", variant="primary")
     with gr.Row():
         with gr.Column():
