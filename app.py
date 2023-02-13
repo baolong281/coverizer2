@@ -308,6 +308,10 @@ with gr.Blocks() as demo:
         # MAT Primer for Stable Diffusion
         ## based on MAT: Mask-Aware Transformer for Large Hole Image Inpainting
         ### create a primer for use in stable diffusion outpainting
+
+        i have added 2 example scripts to the repo:
+        - outpainting_example1.py  using the inpainting pipeline
+        - outpainting_example2.py  using the img2img pipeline. this is basically what i used for the examples below
         ''')
 
     gr.HTML(f'''<a href="{maturl}">{maturl}</a>''')
