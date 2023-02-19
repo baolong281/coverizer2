@@ -301,7 +301,7 @@ class Predictor:
         )
         i.putalpha(morig)
         img = i
-        img.save('0.png')
+        # img.save('0.png')
         assert img.width == img.height
         assert img.width > 512 and img.width < 512*2
 
@@ -319,7 +319,7 @@ class Predictor:
 
         for ix, tc in enumerate(tile_coords(img, n=2)):
             i = img.crop(tc)
-            i.save(f't{ix}.png')
+            # i.save(f't{ix}.png')
             m = i.getchannel('A')
 
             """Run a single prediction on the model"""
@@ -338,7 +338,7 @@ class Predictor:
                 inpainted,
                 1-(np.array(m) / 255)
             )
-            inpainted.save(f't{ix}_op.png')
+            # inpainted.save(f't{ix}_op.png')
             minpainted = mask_to_alpha(inpainted, m)
             # continue with partially inpainted image
             # since the tiles overlap, the next tile will contain (possibly inpainted) parts of the previous tile
