@@ -303,7 +303,7 @@ class Predictor:
         img = i
         # img.save('0.png')
         assert img.width == img.height
-        assert img.width > 512 and img.width < 512*2
+        assert img.width > 512 and img.width <= 512*2
 
         def tile_coords(image, n=2, tile_size=512):
             assert image.width == image.height
@@ -403,7 +403,7 @@ with gr.Blocks() as demo:
             border = gc.Slider(1, 50, 0, step=1, label='border to crop from the image before outpainting')
             seed = gc.Slider(1, 65536, 10, step=1, label='seed')
             size = gc.Slider(0, 1, .5, step=0.01,label='scale of the image before outpainting')
-            tiled = gc.Checkbox(label='tiled: run the network with 4 tiles of size 512x512 . only usable if output size >512 and <1024', value=False)
+            tiled = gc.Checkbox(label='tiled: run the network with 4 tiles of size 512x512 . only usable if output size >512 and <=1024', value=False)
 
             model = gc.Dropdown(
                 choices=['places2',
