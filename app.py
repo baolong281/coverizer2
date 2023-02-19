@@ -283,21 +283,94 @@ class Predictor:
         minpainted = mask_to_alpha(inpainted, m)
         return inpainted, minpainted,  ImageOps.invert(m)
 
+    def predict_tiled(
+        self,
+        img: Image.Image,
+        tosize=(512, 512),
+        border=5,
+        seed=42,
+        size=0.5,
+        model='places2',
+    ) -> Image:
 
+        i, morig = pad(
+            img,
+            size=size,  # (328, 328),
+            tosize=tosize,
+            border=border
+        )
+        i.putalpha(morig)
+        img = i
+        img.save('0.png')
+        assert img.width == img.height
+        assert img.width > 512 and img.width < 512*2
+
+        def tile_coords(image, n=2, tile_size=512):
+            assert image.width == image.height
+            offsets = np.linspace(0, image.width - tile_size, n).astype(int)
+            for i in range(n):
+                for j in range(n):
+                    left = offsets[j]
+                    upper = offsets[i]
+                    right = left + tile_size
+                    lower = upper + tile_size
+                    # tile = image.crop((left, upper, right, lower))
+                    yield [left, upper, right, lower]
+
+        for ix, tc in enumerate(tile_coords(img, n=2)):
+            i = img.crop(tc)
+            i.save(f't{ix}.png')
+            m = i.getchannel('A')
+
+            """Run a single prediction on the model"""
+            imgs = self.models[model].generate_images2(
+                dpath=[i.resize((512, 512), resample=Image.Resampling.NEAREST)],
+                mpath=[m.resize((512, 512), resample=Image.Resampling.NEAREST)],
+                seed=seed,
+            )
+            img_op_raw = imgs[0].convert('RGBA')
+            # img_op_raw = img_op_raw.resize(tosize, resample=Image.Resampling.NEAREST)
+            inpainted = img_op_raw.copy()
+
+            # paste original image to remove inpainting/scaling artifacts
+            inpainted = blend(
+                i,
+                inpainted,
+                1-(np.array(m) / 255)
+            )
+            inpainted.save(f't{ix}_op.png')
+            minpainted = mask_to_alpha(inpainted, m)
+            # continue with partially inpainted image
+            # since the tiles overlap, the next tile will contain (possibly inpainted) parts of the previous tile
+            img.paste(inpainted, tc)
+
+        # restore original alpha channel
+        img.putalpha(morig)
+        return img.convert('RGB'), img,  ImageOps.invert(img.getchannel('A'))
 predictor = Predictor()
 
 # %%
 
 
-def _outpaint(img, tosize, border, seed, size, model):
-    img_op = predictor.predict(
-        img,
-        border=border,
-        seed=seed,
-        tosize=(tosize, tosize),
-        size=float(size),
-        model=model,
-    )
+def _outpaint(img, tosize, border, seed, size, model, tiled):
+    if tiled:
+        img_op = predictor.predict_tiled(
+            img,
+            border=border,
+            seed=seed,
+            tosize=(tosize, tosize),
+            size=float(size),
+            model=model,
+        )
+    else:
+        img_op = predictor.predict(
+            img,
+            border=border,
+            seed=seed,
+            tosize=(tosize, tosize),
+            size=float(size),
+            model=model,
+        )
     return img_op
 # %%
 
@@ -330,6 +403,7 @@ with gr.Blocks() as demo:
             border = gc.Slider(1, 50, 0, step=1, label='border to crop from the image before outpainting')
             seed = gc.Slider(1, 65536, 10, step=1, label='seed')
             size = gc.Slider(0, 1, .5, step=0.01,label='scale of the image before outpainting')
+            tiled = gc.Checkbox(label='tiled: run the network with 4 tiles of size 512x512 . only usable if output size >512 and <1024', value=False)
 
             model = gc.Dropdown(
                 choices=['places2',
@@ -346,7 +420,7 @@ with gr.Blocks() as demo:
 
     btn.click(
         fn=_outpaint,
-        inputs=[searchimage, to_size, border, seed, size, model],
+        inputs=[searchimage, to_size, border, seed, size, model,tiled],
         outputs=[outwithoutalpha, out,  mask])
 
 
