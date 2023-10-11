@@ -4,7 +4,7 @@
 # (only tested with runwayml/stable-diffusion-v1-5)
 
 from typing import Callable, List, Optional, Union
-from PIL import Image
+from PIL import Image, ImageOps
 import PIL
 import numpy as np
 import torch
@@ -16,27 +16,59 @@ from diffusers.pipelines.stable_diffusion.pipeline_stable_diffusion_img2img impo
 pipe = StableDiffusionImg2ImgPipeline.from_pretrained(
     "runwayml/stable-diffusion-v1-5",
     revision="fp16",
-    torch_dtype=torch.float16,
+    torch_dtype=torch.bfloat16,
 )
 
-pipe.set_use_memory_efficient_attention_xformers(True)
-pipe.to("cuda")
-# %%
-# load the image, extract the mask
-rgba = Image.open('primed_image_with_alpha_channel.png')
-mask_full = np.array(rgba)[:, :, 3] == 0
-rgb = rgba.convert('RGB')
+if torch.cuda.is_available():
+    pipe.set_use_memory_efficient_attention_xformers(True)
+    pipe.to("cuda")
+    print("Using CUDA")
+else:
+    print("Using CPU")
+
+def pad(img, size=(128, 128), tosize=(512, 512), border=1):
+    if isinstance(size, float):
+        size = (int(img.size[0] * size), int(img.size[1] * size))
+    # remove border
+    w, h = tosize
+
+    new_img = Image.new('RGBA', (w, h))
+
+    rimg = img.resize(size, resample=Image.Resampling.NEAREST)
+    rimg = ImageOps.crop(rimg, border=border)
+    tw, th = size
+    tw, th = tw - border*2, th - border*2
+    tc = ((w-tw)//2, (h-th)//2)
+
+    new_img.paste(rimg, tc)
+    mask = Image.new('L', (w, h))
+    white = Image.new('L', (tw, th), 255)
+    mask.paste(white, tc)
+
+    if 'A' in rimg.getbands():
+        mask.paste(rimg.getchannel('A'), tc)
+    return new_img, mask
+
 # %%
 
-# resize/convert the mask to the right size
-# for 512x512, the mask should be 1x4x64x64
-hw = np.array(mask_full.shape)
-h, w = (hw - hw % 32) // 8
-mask_image = Image.fromarray(mask_full).resize((w, h), Image.NEAREST)
-mask = (np.array(mask_image) == 0)[None, None]
-mask = np.concatenate([mask]*4, axis=1)
-mask = torch.from_numpy(mask).to('cuda')
-mask.shape
+# load the image, extract the mask
+img = Image.open('./punisher.png')
+# mask_full = np.array(rgba)[:, :, 3] == 0
+# rgb = rgba.convert('RGB')
+# # %%
+#
+# # resize/convert the mask to the right size
+# # for 512x512, the mask should be 1x4x64x64
+# hw = np.array(mask_full.shape)
+# h, w = (hw - hw % 32) // 8
+# mask_image = Image.fromarray(mask_full).resize((w, h), Image.NEAREST)
+# mask = (np.array(mask_image) == 0)[None, None]
+# mask = np.concatenate([mask]*4, axis=1)
+# mask = torch.from_numpy(mask).to('cuda')
+# mask.shape
+
+rgba, mask = pad(img)
+rgb = rgba.convert('RGB')
 
 # %%
 
@@ -185,12 +217,12 @@ def outpaint(
 image = outpaint(
     pipe,
     image=rgb,
-    prompt="forest in the style of Tim Hildebrandt",
+    prompt="",
     strength=0.5,
     num_inference_steps=50,
     guidance_scale=7.5,
 ).images[0]
-image
+image.save('./punisher_out.png')
 
 # %%
 # the vae does lossy encoding, we could get better quality if we pasted the original image into our result.

@@ -1,13 +1,7 @@
----
-title: Stable Diffusion Mat Outpainting Primer
-emoji: 🐢
-colorFrom: red
-colorTo: purple
-sdk: gradio
-sdk_version: 3.4
-app_file: app.py
-pinned: false
-license: cc-by-nc-4.0
----
+# coverizer2
 
-Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference
+forked from [Rothfield](https://huggingface.co/spaces/Rothfeld/stable-diffusion-mat-outpainting-primer)
+
+## todo
+- figure out how to properly process images
+- clean up extra things
