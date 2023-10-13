@@ -51,24 +51,23 @@ def pad(img, size=(128, 128), tosize=(512, 512), border=1):
 
 # %%
 
-# load the image, extract the mask
 img = Image.open('./punisher.png')
-# mask_full = np.array(rgba)[:, :, 3] == 0
-# rgb = rgba.convert('RGB')
+rgba, _ = pad(img)
+rgb = rgba.convert('RGB')
+mask_full = np.array(rgba)[:, :, 3] == 0
+rgb = rgba.convert('RGB')
 # # %%
 #
 # # resize/convert the mask to the right size
 # # for 512x512, the mask should be 1x4x64x64
-# hw = np.array(mask_full.shape)
-# h, w = (hw - hw % 32) // 8
-# mask_image = Image.fromarray(mask_full).resize((w, h), Image.NEAREST)
-# mask = (np.array(mask_image) == 0)[None, None]
-# mask = np.concatenate([mask]*4, axis=1)
-# mask = torch.from_numpy(mask).to('cuda')
-# mask.shape
+hw = np.array(mask_full.shape)
+h, w = (hw - hw % 32) // 8
+mask_image = Image.fromarray(mask_full).resize((w, h), Image.NEAREST)
+mask = (np.array(mask_image) == 0)[None, None]
+mask = np.concatenate([mask]*4, axis=1)
+mask = torch.from_numpy(mask).to('cuda')
+mask.shapgb = rgba.convert('RGB')
 
-rgba, mask = pad(img)
-rgb = rgba.convert('RGB')
 
 # %%
 
