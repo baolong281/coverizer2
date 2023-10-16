@@ -58,22 +58,26 @@
 }
 
 .right {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    gap: 0.3em;
-    margin-top: -13em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 0.3em;
+  margin-top: -13em;
 }
 
 .submit {
-    background-color: #fcc203;
-    font-weight: bold;
-    font-size: 1.2em;
-    margin-top: 1.4em;
-    transform: scale(1.8);
+  background-color: #fcc203;
+  font-weight: bold;
+  font-size: 1.2em;
+  margin-top: 1.4em;
+  transform: scale(1.8);
 }
 
 .error {
-    color: red;
+  color: red;
+}
+
+.output {
+    margin-top: 1.5em;
 }

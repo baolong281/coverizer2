@@ -9,8 +9,6 @@
 # license agreement from NVIDIA CORPORATION is strictly prohibited.
 
 from networks.mat import Generator
-import gradio as gr
-import gradio.components as gc
 import base64
 import glob
 import os
@@ -219,25 +217,8 @@ class Predictor:
     def __init__(self):
         """Load the model into memory to make running multiple predictions efficient"""
         self.models = {
+            # actually laion300k+laion1200k(opmasked)
             "places2": Inpainter(
-                network_pkl='models/Places_512_FullData.pkl',
-                resolution=512,
-                truncation_psi=1.,
-                noise_mode='const',
-            ),
-            "places2+laion300k": Inpainter(
-                network_pkl='models/Places_512_FullData+LAION300k.pkl',
-                resolution=512,
-                truncation_psi=1.,
-                noise_mode='const',
-            ),
-            "places2+laion300k+laion300k(opmasked)": Inpainter(
-                network_pkl='models/Places_512_FullData+LAION300k+OPM300k.pkl',
-                resolution=512,
-                truncation_psi=1.,
-                noise_mode='const',
-            ),
-            "places2+laion300k+laion1200k(opmasked)": Inpainter(
                 network_pkl='models/Places_512_FullData+LAION300k+OPM1200k.pkl',
                 resolution=512,
                 truncation_psi=1.,
@@ -374,55 +355,3 @@ def _outpaint(img, tosize, border, seed, size, model, tiled):
     return img_op
 # %%
 
-
-with gr.Blocks() as demo:
-    maturl = 'https://github.com/fenglinglwb/MAT'
-    gr.Markdown(f'''
-        # MAT Primer for Stable Diffusion
-        ## based on MAT: Mask-Aware Transformer for Large Hole Image Inpainting
-        ### create a primer for use in stable diffusion outpainting
-
-        i have added 2 example scripts to the repo:
-        - outpainting_example1.py  using the inpainting pipeline
-        - outpainting_example2.py  using the img2img pipeline. this is basically what i used for the examples below
-        ''')
-
-    gr.HTML(f'''<a href="{maturl}">{maturl}</a>''')
-    with gr.Box():
-        with gr.Row():
-            gr.Markdown(f"""example with strength 0.5""")
-        with gr.Row():
-            gr.HTML("<img src='file/hild.gif'> ")
-            gr.HTML("<img src='file/process.gif'>")
-            gr.HTML("<img src='file/flagscapes.gif'>")
-    btn = gr.Button("Run", variant="primary")
-    with gr.Row():
-        with gr.Column():
-            searchimage = gc.Image(label="image", type='pil', image_mode='RGBA')
-            to_size = gc.Slider(1, 1920, 512, step=1, label='output size')
-            border = gc.Slider(1, 50, 0, step=1, label='border to crop from the image before outpainting')
-            seed = gc.Slider(1, 65536, 10, step=1, label='seed')
-            size = gc.Slider(0, 1, .5, step=0.01,label='scale of the image before outpainting')
-            tiled = gc.Checkbox(label='tiled: run the network with 4 tiles of size 512x512 . only usable if output size >512 and <=1024', value=False)
-
-            model = gc.Dropdown(
-                choices=['places2',
-                         'places2+laion300k',
-                         'places2+laion300k+laion300k(opmasked)',
-                         'places2+laion300k+laion1200k(opmasked)'],
-                value='places2+laion300k+laion1200k(opmasked)',
-                label='model',
-            )
-        with gr.Column():
-            outwithoutalpha = gc.Image(label="primed image without alpha channel", type='pil', image_mode='RGBA')
-            mask = gc.Image(label="outpainting mask", type='pil')
-            out = gc.Image(label="primed image with alpha channel",type='pil', image_mode='RGBA')
-
-    btn.click(
-        fn=_outpaint,
-        inputs=[searchimage, to_size, border, seed, size, model,tiled],
-        outputs=[outwithoutalpha, out,  mask])
-
-
-# %% launch
-demo.launch()

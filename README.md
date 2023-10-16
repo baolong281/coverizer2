@@ -4,8 +4,10 @@ forked from [Rothfield](https://huggingface.co/spaces/Rothfeld/stable-diffusion-
 
 ## todo
 
-- figure out how to properly process images
-- clean up extra things
+- make ui better
+- deploy somewhere
+- containerize
+- use the stable diffusion img2img (need a gpu)
 
 ## pipeline [according to creator](https://huggingface.co/spaces/Rothfeld/stable-diffusion-mat-outpainting-primer/discussions/4)
 
