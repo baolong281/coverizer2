@@ -6,6 +6,28 @@ forked from [Rothfield](https://huggingface.co/spaces/Rothfeld/stable-diffusion-
 
 use ai to expand album covers into wallpapers
 
+## running
+
+using docker
+
+```
+docker compose build
+docker compose up -d
+```
+
+without docker
+```
+# to run backend
+pip install -r requirements.txt
+flask --app server run 
+
+# to run frontend
+cd frontend
+# use any package manger
+npm install
+npm start
+```
+
 ## todo
 
 - make ui better
