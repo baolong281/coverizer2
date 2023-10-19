@@ -14,3 +14,6 @@ imageio-ffmpeg==0.4.3
 timm
 psutil
 scikit-learn
+torch
+flask
+pydantic
